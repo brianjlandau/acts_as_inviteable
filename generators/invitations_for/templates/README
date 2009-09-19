@@ -1,0 +1,11 @@
+Add the following routes to your config/routes.rb file:
+
+    map.resource :invitation, :only => [:new, :create]
+    map.signup   '/signup/:invite_code', :controller => 'users', :action => 'new'
+
+Add to your User model:
+
+    acts_as_inviteable
+    
+Be sure to run rake db:migrate.
+If you want to you may want to change the default invitation limit first in the migration file.
