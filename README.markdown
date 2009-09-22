@@ -1,4 +1,4 @@
-ActsAsInviteable
+acts\_as\_inviteable
 ================
 
 A simple to use plugin for creating an invite system for an app.
