@@ -10,14 +10,14 @@ Use the generator to get started:
 
     script/generate invitations_for User
     
-When it's finished be sure to add this to your routes file (`config/routes.rb`):
+This will add 2 routes to your routes file (`config/routes.rb`) you may wish to edit these:
 
     map.resource :invitation, :only => [:new, :create]
     map.signup   '/signup/:invite_code', :controller => 'users', :action => 'new'
     
-You also need to add `acts_as_inviteable` to your `User` model.
+It will also add `acts_as_inviteable` to your `User` model.
 
-Finally you need to run `rake db:migrate` to add the invitations table and invitation_limit column.
+After running the generator you need to run `rake db:migrate` to add the invitations table and invitation_limit column.
 
 
 ### Options
