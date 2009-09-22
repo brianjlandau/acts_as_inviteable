@@ -1,7 +1,12 @@
 class InvitationsForGenerator < Rails::Generator::NamedBase
   def manifest
     record do |m|
-      m.class_collisions "Invitation", "#{class_name}InvitationMailer", "InvitationsController", "CreateInvitations"
+      m.class_collisions "Invitation", "#{class_name}InvitationMailer", "CreateInvitations", 
+                         'InvitationTest', 'UserInvitationMailerTest'
+      unless options[:skip_controller]
+        m.class_collisions "InvitationsController", 'InvitationsHelper', 'InvitationsHelperTest',
+                           'InvitationsControllerTest'
+      end
       
       m.directory 'test/functional'
       m.directory 'test/unit'
@@ -21,6 +26,30 @@ class InvitationsForGenerator < Rails::Generator::NamedBase
         m.dependency 'controller', ['Invitations', 'new', 'create']
       end
       
+      unless options[:skip_controller]
+        logger.route "map.resource :invitation, :only => [:new, :create]"
+      end
+      logger.route "map.signup   '/signup/:invite_code', :controller => '#{plural_name}', :action => 'new'"
+      logger.edit  "#{class_name} Model: added `acts_as_inviteable`"
+      unless options[:pretend]
+        routing_sentinel = 'ActionController::Routing::Routes.draw do |map|'
+        
+        unless options[:skip_controller]
+          gsub_file 'config/routes.rb', /(#{Regexp.escape(routing_sentinel)})/mi do |match|
+            "#{match}\n  map.resource :invitation, :only => [:new, :create]\n"
+          end
+        end
+        
+        gsub_file 'config/routes.rb', /(#{Regexp.escape(routing_sentinel)})/mi do |match|
+          "#{match}\n  map.signup '/signup/:invite_code', :controller => '#{plural_name}', :action => 'new'\n"
+        end
+        
+        model_sentinel = "class #{class_name} < ActiveRecord::Base"
+        gsub_file "app/models/#{file_name}.rb", /(#{Regexp.escape(model_sentinel)})/mi do |match|
+          "#{match}\n  acts_as_inviteable\n"
+        end
+      end
+      
       m.readme "README"
     end
   end
@@ -35,6 +64,14 @@ class InvitationsForGenerator < Rails::Generator::NamedBase
       opt.separator 'Options:'
       opt.on("--skip-controller",
              "Don't create a controller for creating/sending invitations") { |v| options[:skip_controller] = v }
+    end
+    
+  private
+    # pulled from rails: lib/rails_generator/commands.rb
+    def gsub_file(relative_destination, regexp, *args, &block)
+      path = destination_path(relative_destination)
+      content = File.read(path).gsub(regexp, *args, &block)
+      File.open(path, 'wb') { |file| file.write(content) }
     end
   
 end
