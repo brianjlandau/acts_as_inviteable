@@ -3,7 +3,16 @@ require 'acts_as_test_helper'
 class ActsAsInviteableTest < ActsAsInvitationsTestCase
   context 'acts_as_inviteable' do
     setup do
-      @user = User.new(:username => 'testuser', :email => 'user@example.com')
+      class ::User < ::ActiveRecord::Base
+        validates_presence_of :username
+        acts_as_inviteable
+      end
+
+      class ::Invitation < ::ActiveRecord::Base
+        acts_as_invitation
+      end
+      
+      @user = ::User.new(:username => 'testuser', :email => 'user@example.com')
       @user.invite_not_needed = true
       @user.save!
     end

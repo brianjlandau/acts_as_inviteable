@@ -1,3 +1,4 @@
+require 'active_support'
 require 'acts_as/invitation'
 require 'acts_as/inviteable'
 

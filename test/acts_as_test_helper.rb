@@ -38,15 +38,6 @@ def teardown_db
   end
 end
 
-class User < ::ActiveRecord::Base
-  validates_presence_of :username
-  acts_as_inviteable
-end
-
-class Invitation < ::ActiveRecord::Base
-  acts_as_invitation
-end
-
 class UserInvitationMailer < ActionMailer::Base  
   def invitation(invite)
     subject    "You've been sent an invitation to try out [SITE NAME]"

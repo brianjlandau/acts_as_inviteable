@@ -12,28 +12,30 @@ module ActiveRecord # :nodoc:
       module ClassMethods
         def acts_as_invitation(options = {})
           options.reverse_merge!(:user_class_name => 'User')
-          cattr_accessor :acts_as_invitation_config
-          self.acts_as_invitation_config = options
-          include InstanceMethods
+          unless (self.respond_to?(:acts_as_invitation_config) && self.acts_as_invitation_config.present? && self.method_defined?(:accepted?))
+            cattr_accessor :acts_as_invitation_config
+            self.acts_as_invitation_config = options
+            include InstanceMethods
           
-          belongs_to :sender, :class_name => options[:user_class_name]
-          belongs_to :recipient, :class_name => options[:user_class_name], :foreign_key => 'recipient_email', :primary_key => 'email'
+            belongs_to :sender, :class_name => options[:user_class_name]
+            belongs_to :recipient, :class_name => options[:user_class_name], :foreign_key => 'recipient_email', :primary_key => 'email'
 
-          validates_presence_of :recipient_email
-          validates_presence_of :sender_id, :on => :create
-          validates_format_of :recipient_email, :with => ::ActsAsInviteable::Regex.email, :allow_blank => true
-          validates_uniqueness_of :recipient_email, :token, :case_sensitive => false, :allow_blank => true
-          validate :recipient_is_not_registered
-          validate :sender_has_invitations
+            validates_presence_of :recipient_email
+            validates_presence_of :sender_id, :on => :create
+            validates_format_of :recipient_email, :with => ::ActsAsInviteable::Regex.email, :allow_blank => true
+            validates_uniqueness_of :recipient_email, :token, :case_sensitive => false, :allow_blank => true
+            validate :recipient_is_not_registered
+            validate :sender_has_invitations
 
-          before_create :generate_token
-          after_create  :decrement_sender_count
-          after_create  :send_invite_email
+            before_create :generate_token
+            after_create  :decrement_sender_count
+            after_create  :send_invite_email
 
-          named_scope :by_created_at, :order => 'created_at DESC'
+            named_scope :by_created_at, :order => 'created_at DESC'
 
-          named_scope :unaccepted, :joins => "LEFT OUTER JOIN #{options[:user_class_name].tableize} on #{options[:user_class_name].tableize}.email = invitations.recipient_email",
-                                   :conditions => ["#{options[:user_class_name].tableize}.id IS NULL"]
+            named_scope :unaccepted, :joins => "LEFT OUTER JOIN #{options[:user_class_name].tableize} on #{options[:user_class_name].tableize}.email = invitations.recipient_email",
+                                     :conditions => ["#{options[:user_class_name].tableize}.id IS NULL"]
+          end
         end
       end
       
