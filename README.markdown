@@ -22,10 +22,8 @@ After running the generator you need to run `rake db:migrate` to add the invitat
 
 ### Options
 
-By default users are allowed to invite 5 others. If you wish to change this you must do so in 2 places.  
-First modify the migration file before running `rake db:migrate`.
-Change the default value for the `invitation_limit` column that is being added to the users table.  
-Then you change how you call `acts_as_inviteable` in your users model by adding the `default_invitation_limit` option:
+By default users are allowed to invite 5 others. You can customize this by providing an option to `acts_as_inviteable`.  
+Change how you call `acts_as_inviteable` in your users model by adding the `default_invitation_limit` option:
 
     acts_as_inviteable :default_invitation_limit => 20
 

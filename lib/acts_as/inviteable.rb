@@ -12,7 +12,9 @@ module ActiveRecord # :nodoc:
           include InstanceMethods
           
           cattr_accessor :default_invitation_limit
-          self.default_invitation_limit = options[:default_invitation_limit].blank? ? 5 : options[:default_invitation_limit]
+          self.default_invitation_limit = options[:default_invitation_limit].blank? ? 
+            self.columns_hash["invitation_limit"].default :
+            options[:default_invitation_limit]
           attr_accessor :invitation_code, :invite_not_needed
           attr_protected :invite_not_needed, :invitation_limit
           
