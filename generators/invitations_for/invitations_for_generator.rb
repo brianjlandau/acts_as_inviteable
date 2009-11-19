@@ -11,7 +11,7 @@ class InvitationsForGenerator < Rails::Generator::NamedBase
       m.directory 'test/functional'
       m.directory 'test/unit'
       m.directory 'app/models'
-      m.directory 'app/views/user_invitation_mailer'
+      m.directory "app/views/#{file_name}_invitation_mailer"
       
       m.template 'invitation.rb', 'app/models/invitation.rb'
       m.template 'user_invitation_mailer.rb', "app/models/#{file_name}_invitation_mailer.rb"
