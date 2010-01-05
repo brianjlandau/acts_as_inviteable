@@ -7,11 +7,18 @@ class InvitationsForGenerator < Rails::Generator::NamedBase
         m.class_collisions "InvitationsController", 'InvitationsHelper', 'InvitationsHelperTest',
                            'InvitationsControllerTest'
       end
+      if options[:create_user_model]
+        m.class_collisions class_name
+      end
       
       m.directory 'test/functional'
       m.directory 'test/unit'
       m.directory 'app/models'
       m.directory "app/views/#{file_name}_invitation_mailer"
+      
+      if options[:create_user_model]
+        m.dependency 'model', [class_name]
+      end
       
       m.template 'invitation.rb', 'app/models/invitation.rb'
       m.template 'user_invitation_mailer.rb', "app/models/#{file_name}_invitation_mailer.rb"
@@ -64,6 +71,10 @@ class InvitationsForGenerator < Rails::Generator::NamedBase
       opt.separator 'Options:'
       opt.on("--skip-controller",
              "Don't create a controller for creating/sending invitations") { |v| options[:skip_controller] = v }
+      opt.on("--create-user-model",
+             "Create the User model too (usefull if you haven't already done this)") { |v|
+               options[:create_user_model] = v
+             }
     end
     
   private
